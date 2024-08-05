@@ -1,0 +1,44 @@
+﻿@page "/filedownload"
+@using System.IO
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<script>
+    // 請 browser 透過發一個 Request 去 Server 拿檔案
+    window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+        const arrayBuffer = await contentStreamReference.arrayBuffer();
+        const blob = new Blob([arrayBuffer]);
+        const url = URL.createObjectURL(blob);
+        const anchorElement = document.createElement('a');
+        anchorElement.href = url;
+        anchorElement.download = fileName ?? '';
+        anchorElement.click();
+        anchorElement.remove();
+        URL.revokeObjectURL(url);
+    }
+</script>
+
+<PageTitle>FileDownload</PageTitle>
+
+<h1>File Download Example 1</h1>
+
+<button @onclick="DownloadFileFromStream">
+    Download File From Stream
+</button>
+
+@code {
+    private Stream GetFileStream()
+    {
+        return File.OpenRead(@"D:\Temp\Blazor8ServerFileDownloadLab1\Blazor8ServerFileDownloadLab1\wwwroot\download\C0925_stages_說明書_20170602.pdf");
+    }
+
+    private async Task DownloadFileFromStream()
+    {
+        var fileStream = GetFileStream();
+        var fileName = "C0925_stages_說明書.pdf";
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+}
