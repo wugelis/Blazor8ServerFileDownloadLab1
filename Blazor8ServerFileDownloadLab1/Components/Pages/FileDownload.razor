@@ -2,6 +2,7 @@
 @using System.IO
 @rendermode InteractiveServer
 @inject IJSRuntime JS
+@inject IWebHostEnvironment webHostEnviroment
 
 <script>
     // 請 browser 透過發一個 Request 去 Server 拿檔案
@@ -29,7 +30,10 @@
 @code {
     private Stream GetFileStream()
     {
-        return File.OpenRead(@"D:\Temp\Blazor8ServerFileDownloadLab1\Blazor8ServerFileDownloadLab1\wwwroot\download\C0925_stages_說明書_20170602.pdf");
+        string pdfFilePath = Path.Combine(webHostEnviroment.WebRootPath, @"download\C0925_stages_說明書_20170602.pdf");
+        return File.OpenRead(pdfFilePath);
+
+        //return File.OpenRead(@"D:\Temp\Blazor8ServerFileDownloadLab1\Blazor8ServerFileDownloadLab1\wwwroot\download\C0925_stages_說明書_20170602.pdf");
     }
 
     private async Task DownloadFileFromStream()
